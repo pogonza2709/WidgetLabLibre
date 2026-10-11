@@ -1,0 +1,42 @@
+
+name: Compilar APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "WidgetLabLibre_ProyectoAndroid.zip"
+      - ".github/workflows/android.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Extraer proyecto
+        run: |
+          unzip -o WidgetLabLibre_ProyectoAndroid.zip -d source
+
+      - name: Compilar APK
+        working-directory: source
+        run: gradle assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: WidgetLabLibre-debug-apk
+          path: source/app/build/outputs/apk/debug/app-debug.apk
+          
